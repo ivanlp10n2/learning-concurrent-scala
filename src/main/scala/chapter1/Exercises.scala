@@ -1,4 +1,4 @@
-package introduction
+package chapter1
 
 import scala.util.Try
 
@@ -33,9 +33,9 @@ object Exercises extends App {
       if (word.size == 1) List(word)
       else
         for {
-          head <- word
-          perms <- perm(word.filterNot(_ == head))
-        } yield head :: perms
+          char <- word
+          perms <- perm(word.filterNot(_ == char))
+        } yield char :: perms
     }
 
     perm(x.toList).map(_.mkString)
