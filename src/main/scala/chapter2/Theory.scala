@@ -1,51 +1,114 @@
 package chapter2
 
-object Theory {
+object Theory extends App {
 
-  /** The memory model in Scala, its multithreading (Threads), and its
-    * inter-thread synchronization (thread locks) are all inherited from the JVM
-    */
+  object Processes {
 
-  /** A memory model is a trade-off between the predictable behavior of a
-    * concurrent program and a compiler's ability to perform optimizations. Not
-    * every language or platform has a memory model. A typical purely functional
-    * programming language, which doesn't support mutations, does not need a
-    * memory model at all.
-    */
+    /** The memory model in Scala, its multithreading (Threads), and its
+      * inter-thread synchronization (thread locks) are all inherited from the
+      * JVM
+      */
 
-  /** Starting a new JVM instance always creates only one process. Within the
-    * JVM process, multiple threads can run simultaneously
-    *
-    * process has isolated memory spaces. two processes cannot read each others
-    * memory directly or simultaneously use most of the resources
-    */
+    /** A memory model is a trade-off between the predictable behavior of a
+      * concurrent program and a compiler's ability to perform optimizations.
+      * Not every language or platform has a memory model. A typical purely
+      * functional programming language, which doesn't support mutations, does
+      * not need a memory model at all.
+      */
+  }
 
-  /** Calling the start method on a new thread notifies the OS that the thread
-    * must start executing. Eventually results in executing the run method from
-    * the new thread.
-    *
-    * When the OS decides to assign the new thread to some processor, this is
-    * largely out of the programmer's control, but the OS must ensure that this
-    * eventually happens.
-    *
-    * After the main thread starts the new thread t, it calls its join method.
-    *
-    * This method halts the execution of the main thread until t completes its
-    * execution. We can say that the join operation puts the main thread into
-    * the waiting state until t terminates. Importantly, the waiting thread
-    * relinquishes its control over the processor, and the OS can assign that
-    * processor to some other thread.
-    */
+  class Threads {
 
-  /** You don't know when the Thread is going to be executed. That's an OS
-    * decision
-    */
+    /** Starting a new JVM instance always creates only one process. Within the
+      * JVM process, multiple threads can run simultaneously
+      *
+      * process has isolated memory spaces. two processes cannot read each
+      * others memory directly or simultaneously use most of the resources
+      */
 
-  /** You can start a thread which will take a part of processor time in a given
-    * time. If you use .join() it will wait until the thread has been executed
-    * and finished. It sets your thread to WAITING STATE and it synchronizes its
-    * finishing
-    */
+    /** Calling the start method on a new thread notifies the OS that the thread
+      * must start executing. Eventually results in executing the run method
+      * from the new thread.
+      *
+      * When the OS decides to assign the new thread to some processor, this is
+      * largely out of the programmer's control, but the OS must ensure that
+      * this eventually happens.
+      *
+      * After the main thread starts the new thread t, it calls its join method.
+      *
+      * This method halts the execution of the main thread until t completes its
+      * execution. We can say that the join operation puts the main thread into
+      * the waiting state until t terminates. Importantly, the waiting thread
+      * relinquishes its control over the processor, and the OS can assign that
+      * processor to some other thread.
+      */
+
+    /** You don't know when the Thread is going to be executed. That's an OS
+      * decision
+      */
+
+    /** You can start a thread which will take a part of processor time in a
+      * given time. If you use .join() it will wait until the thread has been
+      * executed and finished. It sets your thread to WAITING STATE and it
+      * synchronizes its finishing
+      */
+
+    /** Thread states:
+      *   - When a Thread object is created, it is initially in the new state
+      *
+      *   - After the newly created thread object starts executing, it goes into
+      *     the runnable state
+      *
+      *   - After the thread is done executing, the thread object goes into the
+      *     terminated state, and cannot execute any more
+      */
+
+    /** Thread.sleep puts the current thread into a TIMED WAITING STATE
+      */
+
+    /** A race condition is a phenomenon in which the output of a concurrent
+      * program depends on the execution schedule of the statements in the
+      * program.
+      */
+
+    def thread(f: => Unit): Thread = {
+      val th = new Thread {
+        override def run(): Unit = f
+      }
+      th.start()
+      th
+    }
+
+    def log(s: String): Unit = {
+      val tname = Thread.currentThread()
+      println(s"$tname - $s")
+    }
+
+    var idCounter = 0
+
+    def getUniqueId(): Int = {
+      val newId = idCounter + 1
+      idCounter = newId
+      newId
+    }
+
+    def undertermism = {
+      def printUniqueIds(n: Int): Unit = {
+        val uids = for (i <- 0 until n) yield getUniqueId()
+        log(s"Generated uids: $uids")
+      }
+
+      val t = thread {
+        printUniqueIds(5)
+      }
+      printUniqueIds(5)
+      t.join()
+    }
+
+    undertermism
+  }
+
+  new Threads
 
   object AtomicExecution {
     // ALWAYS SET THE OBJECT WHO HANDLES THE OPERATION with SYNCHRONIZED
