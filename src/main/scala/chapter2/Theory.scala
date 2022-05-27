@@ -108,7 +108,6 @@ object Theory extends App {
         printUniqueIds(5)
       }
       printUniqueIds(5)
-      t.join()
     }
 
     undertermism
